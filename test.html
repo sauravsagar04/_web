@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="style.css">
+	<title class="title">Dashboard</title>
+	<style>
+		img {
+  			max-width: 100%;
+  			height: auto;
+			}
+	</style>
+</head>
+
+<body>
+<!-- left column -->
+<div class="nav-bar">
+		<h2 class="dashboard">Dashboard</h2>
+		<ul class="ul-elem">
+			<li class="li-elem"><a href="#" id="home-link">Home</a></li>
+			<li class="li-elem"><a href="#" id="patient-history-link">Patient Report</a></li>
+			<li class="li-elem"><a href="#" id="doctor-schedule-link">Doctor's Schedule</a></li>
+			<li class="li-elem"><a href="#" id="help-link">Help</a></li>
+		</ul>
+</div>
+
+<!--  main content area -->
+<div class="main-content" id="home">
+<!-- <h1 id="main-heading">Dashboard</h1> -->
+<p id="main-content-text">Patient's Reports: To predict a patient's disease with help of AI models (enter Patient's ID and the disease to be predicted) </br> Doctor's Schedule: To efficiently put the patients in a order the Doctor's Schedule using the AI models.</p>
+
+<!-- patient history section -->
+<div id="patient-history" style="display:none;">
+		<h2>Report Testing</h2>
+		<form action="" method="post" enctype="multipart/form-data" id="predict-form">
+			<label for="patient-id">Patient ID:</label>
+			<input type="text" id="patient-id" name="patient-id">
+			<label for="Report_type" >Medical condition to diagnose:</label>
+			<select id="Report_type" name="Report_type">
+				<option value="" selected disabled>Select</option>
+				<option value="brainct">Brain CT-Scan</option>
+				<option value="lungxr">Lung X-Ray</option>y
+				<option value="diabrep">Diabetes Report</option>
+				<option value="chestct">Chest CT-Scan</option>
+				
+			</select>
+			<button type="button" onclick="predict()">Submit</button>
+		</form>
+    
+		
+<img id="reportim" style="display:none; width: 300px; height: 300px;">
+    
+<table id="reportTable" style="display: none;">
+</table>		
+    
+<br>
+<p>Results will be shown here:<p id="prediction_result" ></p></p>
+
+</div>
+
+<!-- doctor's schedule section -->
+<div id="doctor-schedule" style="display:none;">
+			<h2>Doctor's Schedule</h2>
+			<form>
+				
+				<label for="doctor-name">Doctor's ID:</label>
+				<input type="text" id="doctor-name" name="doctor-name">
+				<label for="date">Date:</label>
+				<input type="date" id="date" name="date">
+				<button type="submit">Submit</button>
+			</form>
+</div>
+</div>
+
+<script>
+
+function predict() {
+  console.log("predict() function is being called.");
+
+  event.preventDefault();
+
+  var patientId = document.getElementById("patient-id").value;
+  console.log("patientId: ", patientId);
+
+  var image = document.getElementById("reportim");
+  console.log("image element: ", image);
+
+  var table = document.getElementById("reportTable");
+
+  var R_type = document.getElementById("Report_type").value;
+  console.log("R_type: ", R_type);
+
+  var xhr = new XMLHttpRequest();
+  console.log("XMLHttpRequest object created:", xhr);
+
+  xhr.open("POST", "/test", true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  var data = JSON.stringify({"patient-id": patientId, "Report_type": R_type});
+  console.log("Request payload: ", data);
+
+  xhr.onreadystatechange = function() {
+    console.log("Ready state changed to ", xhr.readyState);
+    console.log("Status: ", xhr.status);
+
+    if (xhr.readyState === 4 && xhr.status === 200) {
+    console.log("Server responded correctly.");
+    var result = JSON.parse(xhr.responseText);
+    var predictionResult = document.getElementById("prediction_result");
+    var type_of_report = result['type'];
+
+    if (type_of_report === 'img') {
+        // Handle image display
+    table.style.display = "none";
+    image.src = "/static" + "/" + R_type + "/" + patientId + ".jpg";
+    image.style.display = "block";
+    predictionResult.innerHTML = "<br><br><p>Patient ID: " + result['patient-id'] + "</p><p> Medical Condition: " + result['Report_type'] + "</p><p>Diagnosis: " + result['diagnosis'] + "</p>";
+    predictionResult.style.display = "block";
+    } else {
+        // Handle table display
+        image.style.display = "none";
+        columns = result['columns'];
+        var values = result['values']; 
+
+        var tableHeader = '<thead><tr><th>Columns</th><th>Values</th></tr></thead>';
+        var tableBody = '<tbody>';
+
+        for (var i = 0; i < columns.length; i++) {
+            tableBody += '<tr><td>' + columns[i] + '</td><td>' + values[i] + '</td></tr>';
+        }
+
+        tableBody += '</tbody>';
+
+        table.innerHTML = tableHeader + tableBody;
+        table.style.display = "block";
+        predictionResult.innerHTML = "<br><br><p>Patient ID: " + result['patient-id'] + "</p><p>Medical Condition: " + result['Report_type'] + "</p><p>Diagnosis: " + result['diagnosis'] + "</p>";
+        predictionResult.style.display = "block";
+    }
+}
+
+
+  };
+
+  xhr.send(data);
+}
+
+
+
+		const patientHistoryLink = document.querySelector('#patient-history-link');
+		const patientHistorySection = document.querySelector('#patient-history');
+		const doctorScheduleLink = document.querySelector('#doctor-schedule-link');
+		const doctorScheduleSection = document.querySelector('#doctor-schedule');
+		const homeLink = document.querySelector('#home-link');
+		const homeSection = document.querySelector('#home');
+		const presub = document.querySelector('#presub');
+		// event listeners for links
+
+		patientHistoryLink.addEventListener('click', function(event) {
+		  event.preventDefault();
+		  patientHistorySection.style.display = 'block';
+		  doctorScheduleSection.style.display = 'none';
+		  document.querySelector('#main-heading').textContent = 'Patient Report';
+		  document.querySelector('#main-content-text').textContent = 'View medical records for a specific patient.';
+		});
+	  
+		doctorScheduleLink.addEventListener('click', function(event) {
+		  event.preventDefault();
+		  doctorScheduleSection.style.display = 'block';
+		  patientHistorySection.style.display = 'none';
+		  document.querySelector('#main-heading').textContent = 'Doctor\'s Schedule';
+		  document.querySelector('#main-content-text').textContent = 'Set a doctor\'s schedule for a specific date.';
+		});
+
+		homeLink.addEventListener('click', function(event) {
+		  event.preventDefault();
+		  
+		  
+		  patientHistorySection.style.display = 'none';
+		  doctorScheduleSection.style.display = 'none';
+		  document.querySelector('#main-heading').textContent = 'Dashboard';
+		  document.querySelector('#main-content-text').innerHTML = "Patient's Reports: To predict a patient's disease with help of AI models (enter Patient's ID and the disease to be predicted) </br> Doctor\'s Schedule: To efficiently put the patients in a order the Doctor\'s Schedule using the AI models.";
+		});
+</script>
+</body> 
+	 
+	 

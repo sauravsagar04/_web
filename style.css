@@ -1,0 +1,51 @@
+	*{
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    /*style for the left column */
+    .nav-bar {
+        width: 100%;
+        height: 10vh;
+        background-color: #00b3b3;
+        color: white;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+    .dashboard{
+        width: 30%;
+    }
+    .ul-elem{
+        width: 70%;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        
+    }
+    .li-elem{
+        list-style: none;
+        color: #ffffff;
+        
+        
+        
+    }
+    a:link {
+        text-decoration: none;
+    }
+
+    		/* style for the main content area */
+		.main-content {
+			width: 80%;
+			height: 100vh;
+			background-color: #ffffff;
+			float: left;
+			padding: 10px;
+			box-sizing: border-box;
+		}
+
+        	/* style for the input fields */
+		input {
+			display: block;
+			margin-bottom: 10px;
+		}
